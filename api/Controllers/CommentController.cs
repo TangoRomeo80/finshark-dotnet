@@ -22,13 +22,17 @@ namespace api.Controllers
 
         [HttpGet]
         public async Task<IActionResult> GetAll() {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
             var comments = await _commentRepository.GetAllAsync();
             var commentDtos = comments.Select(comment => comment.ToCommentDto()).ToList();
             return Ok(commentDtos);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById(int id) {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
             var comment = await _commentRepository.GetByIdAsync(id);
             if (comment == null) {
                 return NotFound();
@@ -36,9 +40,11 @@ namespace api.Controllers
             return Ok(comment.ToCommentDto());
         }
 
-        [HttpPost("{stockId}")]
+        [HttpPost("{stockId:int}")]
         public async Task<IActionResult> Create([FromRoute] int stockId, CreateCommentDto commentDto)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
             var stockExists = await _stockRepository.StockExists(stockId);
             if (!stockExists)
             {
@@ -51,9 +57,11 @@ namespace api.Controllers
         }
 
         [HttpPut]
-        [Route("{id}")]
+        [Route("{id:int}")]
         public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateCommentRequestDto updateDto)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
             var comment = await _commentRepository.UpdateAsync(id, updateDto.ToCommentFromUpdate(id));
 
             if (comment == null)
@@ -65,9 +73,11 @@ namespace api.Controllers
         }
 
         [HttpDelete]
-        [Route("{id}")]
+        [Route("{id:int}")]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
             var commentModel = await _commentRepository.DeleteAsync(id);
 
             if (commentModel == null)
